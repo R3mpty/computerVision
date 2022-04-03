@@ -2,57 +2,72 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.datasets import fetch_olivetti_faces
 
-# Step 1: Obtian faces images as training data (Currently using a library)
+# Get pass odd mac security issue
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
+# Step 1: Obtain faces images as training data (Currently using a library)
 # Download Olivetti faces dataset
-trainningData = fetch_olivetti_faces()
-dolphin = plt.imread('dolphin.jpeg')
-trainningData = [] #TODO: automate this process for all data
+trainingData = fetch_olivetti_faces().images
+flattenedImage = []
 
 # Step 2: Represeant every image I as a vector i
 # (Flatening the image)
-def flatternImage(image):
-    return image.flatten('F') # This F is important, it flatterns it the way we want it
-
+for image in trainingData:  
+    flattenedImage.append(image.flatten('F')) # This F is important, it flatterns it the way we want it
 
 # Step 3: Calculating the mean face image
-trainningData.append(flatternImage(dolphin)) #TODO: automate this process for all data
-
-def meanFaceVector(trainingData):
-    M = len(trainingData)
-    return (1/M) * np.sum(trainingData)  
+meanFaceVector = (1 / len(flattenedImage)) * np.sum(flattenedImage)  
 
 # Step 4: Subtract the mean image from the original image vector
 subtracted = [] # difference between each image and the mean
-for image in trainningData:
-    subtracted.append(image - meanFaceVector(trainningData))
+for image in flattenedImage:
+    subtracted.append(image - meanFaceVector)
+subtracted = np.asarray(subtracted)
 
 # Step 5: Calculating the covariance matrix
-A = np.concatenate(subtracted)
-# print(A)
-C = (1/len(trainningData)) * (A * np.matrix.transpose(A))
-# print(C)
+A = np.matrix.transpose(subtracted)
+C = (1/len(trainingData)) * np.matmul(A, np.matrix.transpose(A))
 
-# Step 6: Compute the eigen values of eigen vecotrs of C
-def findingEigenvalues(c):
-    return np.linalg.eig(c)
+# Step 6: Compute the eigenvalues and eigenvectors of C
+eigenVals, eigenVecs = np.linalg.eig(C)
+print(eigenVals.shape)
+print(eigenVecs.shape)
+eigenData = {}
+eiginVecsList = np.nditer(eigenVecs)
+for index, val in enumerate(eigenVals):
+    eigenData[val] = eigenVecs[index]
 
-eigen_vals, eigen_vecs = findingEigenvalues(c)
+# Select best k eigenvectors (k largest eigence values)
+BEST_K = 6
+eigenValsSorted = sorted(eigenData.items(), key=lambda x: x[1], reverse=True)
+bestKEigenvectors = eigenValsSorted[:BEST_K]
+
+# for i in range sorted_dummy:
+#     best_k_eigenVectors.append(eigenData.get(i))
+
+# Step 7: How to reconstruct image I <--
+# I = meanFaceVector + eigen_vecs * weight
+
+# Step 8: Collecting weight
+# Weight is the product of image (vector) with each of the eigen vectors [9:08]
+weights = np.empty([4096, 400])
 
 
-# Step 7:
+# Step 9: Euclidean distance between the mean face and the test image
+# def euclideanDistance(x,y):
+#     return np.linalg.norm(x-y)
 
+########
+# stolen from github
 
+#for ev in v2:
+#    ev_transpose = np.transpose(np.matrix(ev))
+#    u = np.dot(Zero_mean_matrix,ev_transpose)
+#    #norms = np.linalg.norm(u, axis=0)                           
+#    u = u / np.linalg.norm(u)
+#    #u = u / norms
+#    u_i= u.reshape(425,425)
+#    u_list.append(u_i)
 
-
-
-# Step 8:
-
-
-
-
-
-
-
-
-
+########
