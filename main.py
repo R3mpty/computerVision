@@ -6,6 +6,7 @@ from sklearn.datasets import fetch_olivetti_faces
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
+### Algorithm ####
 # Step 1: Obtain faces images as training data (Currently using a library)
 # Download Olivetti faces dataset
 trainingData = fetch_olivetti_faces().images
@@ -43,8 +44,7 @@ BEST_K = 6
 eigenValsSorted = sorted(eigenData.items(), key=lambda x: x[1], reverse=True)
 bestKEigenvectors = eigenValsSorted[:BEST_K]
 
-# for i in range sorted_dummy:
-#     best_k_eigenVectors.append(eigenData.get(i))
+# Representing faces onto this basis <--
 
 # Step 7: How to reconstruct image I <--
 # I = meanFaceVector + eigen_vecs * weight
@@ -54,20 +54,12 @@ bestKEigenvectors = eigenValsSorted[:BEST_K]
 weights = np.empty([4096, 400])
 
 
-# Step 9: Euclidean distance between the mean face and the test image
+# Step 9: Euclidean distance between the mean face and the test image <-- Not in the implementation section?
 # def euclideanDistance(x,y):
 #     return np.linalg.norm(x-y)
 
-########
-# stolen from github
 
-#for ev in v2:
-#    ev_transpose = np.transpose(np.matrix(ev))
-#    u = np.dot(Zero_mean_matrix,ev_transpose)
-#    #norms = np.linalg.norm(u, axis=0)                           
-#    u = u / np.linalg.norm(u)
-#    #u = u / norms
-#    u_i= u.reshape(425,425)
-#    u_list.append(u_i)
+### Testing ###
 
-########
+
+
