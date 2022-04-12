@@ -48,10 +48,6 @@ eigenValsSorted = sorted(eigenData.items(), key=lambda x: x[0], reverse=True)
 bestKEigenvectors = eigenValsSorted[:BEST_K]
 
 # Representing faces onto this basis
-
-# Step 7: How to reconstruct image I <--
-# I = meanFaceVector + eigen_vecs * weight
-
 # Step 8: Collecting weight
 # Weight is the product of image (vector) with each of the eigen vectors [9:08]
 weights = []
@@ -60,25 +56,34 @@ for img in flattenedImages:
     faceMinusAvg = img - meanFaceVector
     weights.append(np.linalg.norm(faceMinusAvg - meanFaceVector))
 
-print(weights[:10])
-print(len(weights))
-
-# Step 9: Euclidean distance between the mean face and the test image <-- Not in the implementation section?
-# def euclideanDistance(x,y):
-#     return np.linalg.norm(x-y)
-
+# # Printing stuff out
+# fig, axs = plt.subplot(221)
+# for i in np.arrage(10):
+#     ax = plt.subplot(221)
+#     img = eigenVecs[:,i].reshape(49, 58)
+#     plt.imshow(img, cmap = 'gray')
+# fig.suptitle("First 10 eigence faces:", fontsize =16)
 
 ### Testing ###
 # Step 1: Normalize the test image -> I = Test_Image - Average_Face_Vector
 # normalize
-# for img in testingData:
-#     flattened = image.flatten('
+answer = []
+decisions = []
+for img in testingData:
+    flattened = img.flatten('F')
+    faceMinusAvg = flattened - meanFaceVector
+    weight = np.linalg.norm(faceMinusAvg - meanFaceVector)
+    
+    bestVal = abs(weights[0] - weight)
+    bestI = 0
+    i = 0
+    for trainingWeight in weights:
+        val = abs(trainingWeight - weight)
+        if (val < bestVal):
+            bestVal = val
+            bestI = i
+        i += 1
+    
+    decisions.append(bestI)
 
-# Step 2: Find weights of test image
-
-
-# Step 3: Calculate error between weights of test image and weights of all images in training set.
-
-
-# Step 4: Choose the image of training set which has minimum error.
-
+print(decisions)
